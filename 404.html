@@ -1,20 +1,19 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <meta charset="utf-8">
-    <title>LooksGood</title>
-    <script type="text/javascript">
-      var pathSegmentsToKeep = 1;
-      var l = window.location;
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
-      );
-    </script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/LooksGood/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>LooksGood — Know what looks good. Design without the guesswork.</title>
+    <meta name="description" content="Visual design decision assistant for non-designers, developers, and creators. Pick colors, find font pairings, check contrast, and understand why designs work." />
+    <!-- Preconnect Google Fonts for ultra-fast performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@400;600;800&family=Outfit:wght@400;600;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+    <script type="module" crossorigin src="/LooksGood/assets/index-Bs6F5bPk.js"></script>
+    <link rel="stylesheet" crossorigin href="/LooksGood/assets/index-D8n-bR2j.css">
   </head>
-  <body>
+  <body class="bg-[#FAFAFC] text-zinc-900 antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col font-sans">
+    <div id="root" class="flex flex-col min-h-screen"></div>
   </body>
 </html>
