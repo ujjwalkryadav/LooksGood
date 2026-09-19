@@ -91,19 +91,19 @@ export function HomeHeroCanvas() {
   const [activePalette, setActivePalette] = useState(DEFAULT_PALETTE_HEXES);
   const [isWheelClicked, setIsWheelClicked] = useState(false);
 
-  // 4. Capsule Liquid Fills State ([percent0, percent1, percent2])
-  const [capsuleFills, setCapsuleFills] = useState([0, 0, 0]);
+  // 4. Capsule Liquid Fills State ([percent0, percent1, percent2]) - Always 100% on start
+  const [capsuleFills, setCapsuleFills] = useState([100, 100, 100]);
 
   // 5. Typography State
   const [activeFontIndex, setActiveFontIndex] = useState(0);
   const [activeFont, setActiveFont] = useState(FONTS_LIST[0]);
   const [isTypeClicked, setIsTypeClicked] = useState(false);
-  const [isAaFilled, setIsAaFilled] = useState(false);
+  const [isAaFilled, setIsAaFilled] = useState(true);
   const [copiedHex, setCopiedHex] = useState(null);
   const fontCycleIntervalRef = useRef(null);
 
   // 6. Sequence Step Tracker (0 to 6)
-  const [stepPhase, setStepPhase] = useState(0);
+  const [stepPhase, setStepPhase] = useState(6);
 
   // Run the exact user-specified progressive flow
   const runSequence = () => {
@@ -928,7 +928,7 @@ export function HomeHeroCanvas() {
             <div className="flex flex-col items-center justify-center relative">
               {/* 3-Color 2D Clean Capsule Card */}
               <div
-                className="bg-white border border-stone-200 rounded-xl xs:rounded-2xl sm:rounded-[28px] px-2 py-2 xs:px-3 xs:py-2.5 sm:px-5 sm:py-5 shadow-lg sm:shadow-xl transition-all duration-300 max-w-[115px] xs:max-w-[140px] sm:max-w-[240px] md:max-w-[290px] lg:max-w-[340px] w-full"
+                className="bg-white border border-stone-200 rounded-2xl sm:rounded-[28px] px-2 py-2 sm:px-5 sm:py-5 shadow-lg sm:shadow-xl transition-all duration-300 max-w-[130px] sm:max-w-[240px] md:max-w-[290px] lg:max-w-[340px] w-full"
                 style={{
                   boxShadow: `0 10px 25px -6px ${activePalette[0]}20, 0 4px 12px rgba(0,0,0,0.04)`,
                 }}
@@ -937,52 +937,55 @@ export function HomeHeroCanvas() {
                 <div className="flex items-center justify-between mb-1.5 sm:mb-4 px-0.5">
                   <div className="flex items-center space-x-1 sm:space-x-2">
                     <span className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full animate-pulse flex-shrink-0" style={{ backgroundColor: activePalette[0] }} />
-                    <span className="text-[6px] xs:text-[7.5px] sm:text-[9px] md:text-[11px] font-mono font-black text-stone-700 uppercase tracking-wider truncate">
+                    <span className="text-[6.5px] sm:text-[9px] md:text-[11px] font-mono font-black text-stone-700 uppercase tracking-wider truncate">
                       Color Capsules
                     </span>
                   </div>
-                  <span className="text-[5px] xs:text-[6.5px] sm:text-[8px] md:text-[9px] font-mono font-bold px-1 py-0.2 sm:px-2 sm:py-0.5 rounded-full bg-stone-100 text-stone-600 border border-stone-200">
+                  <span className="text-[5.5px] sm:text-[8px] md:text-[9px] font-mono font-bold px-1 py-0.2 sm:px-2 sm:py-0.5 rounded-full bg-stone-100 text-stone-600 border border-stone-200">
                     {capsuleFills[2] >= 100 ? 'Active' : 'Standby'}
                   </span>
                 </div>
 
                 {/* 3 Clean 2D Capsule Pills Row */}
-                <div className="flex items-center justify-center space-x-1 xs:space-x-1.5 sm:space-x-3 md:space-x-4 lg:space-x-5">
+                <div className="flex items-center justify-center space-x-1.5 sm:space-x-3 md:space-x-4 lg:space-x-5">
                   {activePalette.map((hex, idx) => {
                     const isCopied = copiedHex === hex;
                     const roleTag = idx === 0 ? 'Primary' : idx === 1 ? 'Secondary' : 'Accent';
                     const pillCode = idx === 0 ? 'P-01' : idx === 1 ? 'S-02' : 'A-03';
-                    const fillLevel = capsuleFills[idx] || 0;
+                    const fillLevel = capsuleFills[idx] !== undefined ? capsuleFills[idx] : 100;
 
                     return (
                       <div
                         key={idx}
                         onClick={() => fillLevel > 0 && handleCopySwatch(hex)}
-                        className="flex flex-col items-center cursor-pointer group select-none"
+                        className="flex flex-col items-center cursor-pointer group select-none flex-shrink-0"
                         title={fillLevel > 0 ? `Click to copy ${roleTag} (${hex})` : 'Capsule is filling...'}
                       >
                         {/* Pill Identity Header Badge */}
-                        <span className="mb-0.5 sm:mb-1.5 font-mono text-[5px] xs:text-[6.5px] sm:text-[8px] md:text-[9px] font-bold text-stone-400 group-hover:text-stone-800 transition-colors">
+                        <span className="mb-0.5 sm:mb-1.5 font-mono text-[5.5px] sm:text-[8px] md:text-[9px] font-bold text-stone-400 group-hover:text-stone-800 transition-colors">
                           {pillCode}
                         </span>
 
                         {/* 2D Flat Capsule Pill Tube */}
                         <div
-                          className="w-4.5 xs:w-6 sm:w-10 md:w-12 lg:w-14 h-11 xs:h-14 sm:h-22 md:h-28 lg:h-32 rounded-full border xs:border-[1.5px] sm:border-2 border-stone-300/90 bg-stone-100 relative overflow-hidden group-hover:scale-105 group-hover:-translate-y-0.5 sm:group-hover:-translate-y-1 transition-all duration-200 flex flex-col justify-end p-0"
+                          className="w-7 sm:w-10 md:w-12 lg:w-14 h-16 sm:h-22 md:h-28 lg:h-32 rounded-full border border-stone-300 sm:border-2 bg-stone-100 relative overflow-hidden group-hover:scale-105 group-hover:-translate-y-0.5 sm:group-hover:-translate-y-1 transition-all duration-200 flex flex-col justify-end p-0 flex-shrink-0"
                           style={{
+                            minWidth: '26px',
+                            minHeight: '60px',
                             boxShadow: fillLevel > 0 
-                              ? `0 6px 16px -4px ${hex}35` 
+                              ? `0 6px 16px -4px ${hex}45` 
                               : 'none',
                           }}
                         >
                           {/* Minimalist 2D Center Seam Line (50% height) */}
-                          <div className="absolute top-1/2 inset-x-0 -translate-y-1/2 h-[1px] sm:h-[1.5px] bg-stone-300/80 z-20 pointer-events-none" />
+                          <div className="absolute top-1/2 inset-x-0 -translate-y-1/2 h-[1px] sm:h-[1.5px] bg-stone-400/50 z-20 pointer-events-none" />
 
                           {/* 2D Flat Liquid Color Fill */}
                           <div
                             className="w-full transition-all ease-out"
                             style={{
                               height: `${fillLevel}%`,
+                              minHeight: fillLevel > 0 ? `${fillLevel}%` : '0%',
                               backgroundColor: hex,
                               transitionDuration: '600ms',
                               transitionTimingFunction: 'cubic-bezier(0.25, 1, 0.5, 1)',
@@ -1003,8 +1006,7 @@ export function HomeHeroCanvas() {
 
                         {/* HEX code label */}
                         <span 
-                          className="mt-1 sm:mt-2 font-mono text-[4.5px] xs:text-[6px] sm:text-[9px] md:text-[11px] lg:text-xs font-black tracking-tighter sm:tracking-wider transition-colors duration-200"
-                          style={{ color: fillLevel >= 80 ? '#1C1917' : '#9CA3AF' }}
+                          className="mt-1 sm:mt-2 font-mono text-[5.5px] sm:text-[9px] md:text-[11px] lg:text-xs font-black tracking-tight sm:tracking-wider transition-colors duration-200 text-stone-900"
                         >
                           {hex}
                         </span>
