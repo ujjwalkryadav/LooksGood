@@ -9,16 +9,28 @@ import { AllToolsDirectory } from './studios/allTools/AllToolsDirectory';
 import FlowingWaveBackground from './components/home/FlowingWaveBackground';
 import { Search } from 'lucide-react';
 
+function getBasePath() {
+  const path = window.location.pathname;
+  if (path.toLowerCase().startsWith('/looksgood')) {
+    return '/LooksGood';
+  }
+  return '';
+}
+
 function getPathFromState(studioId, tabId) {
-  if (studioId === 'home') return '/';
-  if (studioId === 'colors') return tabId ? `/color-studio/${tabId}` : '/color-studio';
-  if (studioId === 'typography') return tabId ? `/typography-studio/${tabId}` : '/typography-studio';
-  if (studioId === 'allTools') return '/all-tools';
-  return '/';
+  const base = getBasePath();
+  if (studioId === 'home') return base ? `${base}/` : '/';
+  if (studioId === 'colors') return tabId ? `${base}/color-studio/${tabId}` : `${base}/color-studio`;
+  if (studioId === 'typography') return tabId ? `${base}/typography-studio/${tabId}` : `${base}/typography-studio`;
+  if (studioId === 'allTools') return `${base}/all-tools`;
+  return base ? `${base}/` : '/';
 }
 
 function parseStateFromPath(pathname) {
-  const clean = pathname.toLowerCase().replace(/\/$/, '') || '/';
+  let clean = pathname.toLowerCase().replace(/\/$/, '') || '/';
+  if (clean.startsWith('/looksgood')) {
+    clean = clean.replace(/^\/looksgood/, '') || '/';
+  }
   if (clean === '/' || clean === '/home') {
     return { studioId: 'home', tabId: null };
   }
