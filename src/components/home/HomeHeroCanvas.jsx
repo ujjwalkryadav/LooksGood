@@ -328,11 +328,35 @@ export function HomeHeroCanvas() {
     }
   };
 
+  // Touch move for mobile wheel rotation
+  const handleWheelTouchMove = (e) => {
+    if (!wheelRef.current || !e.touches || !e.touches[0]) return;
+    setIsHoveringWheel(true);
+    const rect = wheelRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const touch = e.touches[0];
+    const dx = touch.clientX - centerX;
+    const dy = touch.clientY - centerY;
+
+    let rad = Math.atan2(dy, dx);
+    let deg = (rad * 180) / Math.PI;
+    if (deg < 0) deg += 360;
+
+    setSelectorAngle(deg);
+
+    const newPal = getLuxuryPaletteForAngle(deg);
+    setActivePalette(newPal);
+    if (stepPhase >= 3 || isAaFilled) {
+      setCapsuleFills([100, 100, 100]);
+    }
+  };
+
   const handleWheelMouseLeave = () => {
     setIsHoveringWheel(false);
   };
 
-  // Wheel Click: Pulse and Lock In Color Scheme without redirecting
+  // Wheel Click: Pulse and Lock In Color Scheme without annoying notification popup
   const handleWheelClick = (e) => {
     e.stopPropagation();
     setIsWheelClicked(true);
@@ -351,7 +375,7 @@ export function HomeHeroCanvas() {
       background: '#FAF9F6',
       text: '#0D0C0B',
     });
-    showToast(`Locked in Luxury Palette: ${newPal[0]}, ${newPal[1]}, ${newPal[2]}`, 'success');
+    // Toast notification removed on wheel click as requested!
   };
 
   // Fast dynamic font cycling when hovering over "Aa" (rapid 75ms shuffle for 12 steps)
@@ -386,7 +410,6 @@ export function HomeHeroCanvas() {
     setActiveFontIndex((prev) => {
       const nextIdx = (prev + 1) % FONTS_LIST.length;
       setActiveFont(FONTS_LIST[nextIdx]);
-      showToast(`Switched font to ${FONTS_LIST[nextIdx].name}`, 'info');
       return nextIdx;
     });
   };
@@ -417,10 +440,10 @@ export function HomeHeroCanvas() {
   const dot3Y = 150 + radius * Math.sin(rad3);
 
   return (
-    <section className="relative w-full pt-16 sm:pt-24 md:pt-28 pb-16 sm:pb-24 select-none overflow-hidden">
+    <section className="relative w-full pt-8 sm:pt-16 md:pt-24 pb-10 sm:pb-20 select-none overflow-hidden">
       {/* Top Right Framed Monospace Badge */}
-      <div className="absolute top-10 sm:top-14 right-6 sm:right-12 z-10 hidden md:block text-right">
-        <div className="inline-block p-3.5 rounded-2xl border border-stone-300/80 bg-white/70 backdrop-blur-md shadow-sm font-mono text-[9px] font-black text-stone-600 tracking-[0.24em] leading-relaxed uppercase hover:border-purple-300 transition-colors">
+      <div className="absolute top-6 sm:top-14 right-4 sm:right-12 z-10 hidden md:block text-right">
+        <div className="inline-block p-3 sm:p-3.5 rounded-2xl border border-stone-300/80 bg-white/70 backdrop-blur-md shadow-sm font-mono text-[9px] font-black text-stone-600 tracking-[0.24em] leading-relaxed uppercase hover:border-purple-300 transition-colors">
           S I M P L E<br />
           T O O L S .<br />
           B I G G E R<br />
@@ -428,14 +451,14 @@ export function HomeHeroCanvas() {
         </div>
       </div>
 
-      {/* Main Container - Extra Stretched Ultra-Wide Bounds */}
-      <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-14 xl:px-20 space-y-8 sm:space-y-10">
+      {/* Main Container - Responsive Bounds */}
+      <div className="w-full max-w-[1720px] mx-auto px-2 sm:px-6 lg:px-14 xl:px-20 space-y-6 sm:space-y-10">
         {/* =================================================================== */}
         {/* 1. HERO TITLE & TAGLINE                                             */}
         {/* =================================================================== */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-2 sm:space-y-4">
           {/* Interactive Title: Looks Good. (Letter-by-Letter Liquid Fill & Glass Drain) */}
-          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-[#0D0C0B] flex items-baseline justify-center space-x-3 sm:space-x-6 leading-none">
+          <h1 className="text-4xl xs:text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-[#0D0C0B] flex items-baseline justify-center space-x-2 xs:space-x-3 sm:space-x-6 leading-none">
             {/* Word 1: "Looks" */}
             <span className="inline-flex items-baseline cursor-pointer group" title="Hover over any letter in 'Looks' to fill with liquid color!">
               {LOOKS_LETTERS.map((char, idx) => {
@@ -448,7 +471,8 @@ export function HomeHeroCanvas() {
                     onMouseLeave={() => handleLooksLeave(idx)}
                     onClick={() => handleLooksHover(idx)}
                     onTouchStart={() => handleLooksHover(idx)}
-                    className="relative inline-block transition-transform duration-200 hover:-translate-y-1.5 select-none font-display font-black cursor-pointer"
+                    onTouchMove={() => handleLooksHover(idx)}
+                    className="relative inline-block transition-transform duration-200 hover:-translate-y-1 sm:hover:-translate-y-1.5 select-none font-display font-black cursor-pointer"
                   >
                     {/* Base Empty Glass Outline Layer */}
                     <span
@@ -489,7 +513,8 @@ export function HomeHeroCanvas() {
                     onMouseLeave={() => handleGoodLeave(idx)}
                     onClick={() => handleGoodHover(idx)}
                     onTouchStart={() => handleGoodHover(idx)}
-                    className="relative inline-block transition-transform duration-200 hover:-translate-y-1.5 select-none font-display font-black cursor-pointer"
+                    onTouchMove={() => handleGoodHover(idx)}
+                    className="relative inline-block transition-transform duration-200 hover:-translate-y-1 sm:hover:-translate-y-1.5 select-none font-display font-black cursor-pointer"
                   >
                     {/* Base Empty Glass Outline Layer */}
                     <span
@@ -519,26 +544,26 @@ export function HomeHeroCanvas() {
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl text-stone-600 font-medium font-sans max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xs xs:text-sm sm:text-lg md:text-xl text-stone-600 font-medium font-sans max-w-2xl mx-auto leading-relaxed px-2">
             Design smarter with beautiful colors and typography.
           </p>
 
           {/* Interactive Hint Subtitle */}
-          <div className="flex items-center justify-center space-x-2 text-[11px] sm:text-xs font-mono text-stone-400 h-5">
+          <div className="flex items-center justify-center space-x-2 text-[10px] xs:text-[11px] sm:text-xs font-mono text-stone-400 h-4 sm:h-5">
             <span>Hover across any letter in &ldquo;Looks Good.&rdquo; to fill with vibrant liquid colors</span>
           </div>
         </div>
 
         {/* =================================================================== */}
         {/* 2. THREE-PILLAR FUNCTIONAL DEMONSTRATION ENGINE                     */}
-        {/* All 3 Pillars (Wheel, Capsules Plate, Typography) Visible on Load   */}
-        {/* Progressive Liquid Flow: Wheel ➔ Capsules Fill ➔ Typography Apply   */}
+        {/* All 3 Pillars (Wheel ➔ Capsules Plate ➔ Typography) Stay Horizontal  */}
+        {/* Perfectly Scaled & Responsive Across Mobile, Tablet and Desktop     */}
         {/* =================================================================== */}
-        <div className="relative pt-4 sm:pt-6 pb-6 sm:pb-8">
+        <div className="relative pt-6 sm:pt-10 pb-4 sm:pb-8">
           {/* Background Progressive SVG Flow Ribbons */}
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-visible">
             <svg
-              className="w-full h-64 max-w-[1600px]"
+              className="w-full h-36 sm:h-52 md:h-64 max-w-[1600px]"
               viewBox="0 0 1600 220"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -567,7 +592,7 @@ export function HomeHeroCanvas() {
                 <g>
                   {/* Primary Sleek Line 1 (Wheel to Plate) */}
                   <path
-                    d="M 220 110 C 420 20, 600 200, 800 110"
+                    d="M 240 110 C 440 20, 600 200, 800 110"
                     stroke="url(#luxuryLineGradient)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
@@ -576,7 +601,7 @@ export function HomeHeroCanvas() {
 
                   {/* Secondary Harmonic Wave Line 1 */}
                   <path
-                    d="M 190 125 C 390 205, 590 15, 800 110"
+                    d="M 210 125 C 410 205, 590 15, 800 110"
                     stroke="url(#sleekHarmonicGradient)"
                     strokeWidth="1.25"
                     strokeLinecap="round"
@@ -590,7 +615,7 @@ export function HomeHeroCanvas() {
                       {activePalette.map((hex, idx) => (
                         <g key={idx}>
                           <animateMotion
-                            path="M 220 110 C 420 20, 600 200, 800 110"
+                            path="M 240 110 C 440 20, 600 200, 800 110"
                             dur="0.95s"
                             begin={`${idx * 0.16}s`}
                             rotate="auto"
@@ -626,7 +651,7 @@ export function HomeHeroCanvas() {
                 <g>
                   {/* Primary Sleek Line 2 (Plate to Aa) */}
                   <path
-                    d="M 800 110 C 1000 20, 1180 200, 1380 110"
+                    d="M 800 110 C 1000 20, 1160 200, 1360 110"
                     stroke="url(#luxuryLineGradient)"
                     strokeWidth="2.5"
                     strokeLinecap="round"
@@ -635,7 +660,7 @@ export function HomeHeroCanvas() {
 
                   {/* Secondary Harmonic Wave Line 2 */}
                   <path
-                    d="M 800 110 C 1010 205, 1210 15, 1400 95"
+                    d="M 800 110 C 1010 205, 1200 15, 1380 95"
                     stroke="url(#sleekHarmonicGradient)"
                     strokeWidth="1.25"
                     strokeLinecap="round"
@@ -649,7 +674,7 @@ export function HomeHeroCanvas() {
                       {activePalette.map((hex, idx) => (
                         <g key={idx}>
                           <animateMotion
-                            path="M 800 110 C 1000 20, 1180 200, 1380 110"
+                            path="M 800 110 C 1000 20, 1160 200, 1360 110"
                             dur="1.1s"
                             begin={`${idx * 0.18}s`}
                             rotate="auto"
@@ -702,7 +727,7 @@ export function HomeHeroCanvas() {
 
               {/* Connection Node Sockets */}
               <circle
-                cx="220"
+                cx="240"
                 cy="110"
                 r="4.5"
                 fill={activePalette[0]}
@@ -719,22 +744,31 @@ export function HomeHeroCanvas() {
                 strokeWidth="2"
                 className="transition-all duration-300"
               />
+              <circle
+                cx="1360"
+                cy="110"
+                r="4.5"
+                fill={activePalette[2]}
+                stroke="#FFFFFF"
+                strokeWidth="2"
+                className="transition-all duration-300"
+              />
             </svg>
           </div>
 
-          {/* Three Connected Pillars Grid - All 3 Present from Page Load */}
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-20 items-center justify-between">
+          {/* Three Connected Pillars Horizontal Row (Preserved on all screens) */}
+          <div className="relative z-10 grid grid-cols-3 gap-1 xs:gap-2 sm:gap-6 md:gap-8 lg:gap-14 xl:gap-20 items-center justify-between w-full">
             {/* ------------------------------------------------------------- */}
             {/* PILLAR 1: COLOR WHEEL (Left)                                  */}
             {/* ------------------------------------------------------------- */}
-            <div className="lg:col-span-4 flex flex-col items-center lg:items-start justify-center relative lg:pl-4 xl:pl-8">
+            <div className="flex flex-col items-center justify-center relative">
               {/* Handwritten Note Top: Colors Create Emotions */}
-              <div className="absolute -top-12 sm:-top-14 -left-2 sm:left-4 lg:left-8 flex items-center space-x-2 pointer-events-none transform -rotate-6">
-                <span className="font-handwriting text-2xl sm:text-3xl lg:text-3xl text-stone-700 font-bold tracking-wide">
+              <div className="absolute -top-7 xs:-top-9 sm:-top-14 -left-1 xs:left-0 sm:left-2 lg:left-6 flex items-center space-x-1 sm:space-x-2 pointer-events-none transform -rotate-6">
+                <span className="font-handwriting text-[9px] xs:text-[11px] sm:text-2xl lg:text-3xl text-stone-700 font-bold tracking-tight whitespace-nowrap">
                   Colors Create Emotions
                 </span>
                 <svg
-                  className="w-9 h-9 text-stone-600 transform rotate-12 -translate-y-1"
+                  className="w-4 h-4 xs:w-5 xs:h-5 sm:w-9 sm:h-9 text-stone-600 transform rotate-12 -translate-y-0.5"
                   viewBox="0 0 40 40"
                   fill="none"
                   stroke="currentColor"
@@ -749,19 +783,21 @@ export function HomeHeroCanvas() {
               <div
                 ref={wheelRef}
                 onMouseMove={handleWheelMouseMove}
+                onTouchMove={handleWheelTouchMove}
+                onTouchStart={handleWheelTouchMove}
                 onMouseLeave={handleWheelMouseLeave}
                 onClick={handleWheelClick}
-                className={`relative w-56 h-56 sm:w-68 sm:h-68 lg:w-76 lg:h-76 rounded-full cursor-pointer transition-all duration-500 ease-out transform ${
-                  isWheelClicked ? 'scale-105 ring-8 ring-purple-400/30' : ''
+                className={`relative w-20 h-20 xs:w-26 xs:h-26 sm:w-48 sm:h-48 md:w-60 md:h-60 lg:w-72 lg:h-72 xl:w-76 xl:h-76 rounded-full cursor-pointer transition-all duration-500 ease-out transform ${
+                  isWheelClicked ? 'scale-105 ring-4 sm:ring-8 ring-purple-400/30' : ''
                 }`}
                 style={{
-                  boxShadow: `0 0 60px ${activePalette[0]}35, 0 20px 45px -10px rgba(0,0,0,0.1)`,
+                  boxShadow: `0 0 40px ${activePalette[0]}30, 0 10px 30px -8px rgba(0,0,0,0.1)`,
                 }}
-                title="Hover & drag cursor to generate 3 luxury harmonic colors. Click to lock in & shuffle!"
+                title="Rotate or tap to change harmonic colors"
               >
                 {/* 360 Conic Gradient Color Wheel with Luxury Spectral Harmonies */}
                 <div
-                  className={`w-full h-full rounded-full border-4 border-white shadow-xl transition-transform duration-1000 relative overflow-hidden ${
+                  className={`w-full h-full rounded-full border-2 sm:border-4 border-white shadow-md sm:shadow-xl transition-transform duration-1000 relative overflow-hidden ${
                     isHoveringWheel ? '' : 'animate-[spin_45s_linear_infinite]'
                   }`}
                   style={{
@@ -774,22 +810,22 @@ export function HomeHeroCanvas() {
                 </div>
 
                 {/* Inner Ambient Center Hole (Frosted Glass Hub with Mini Swatch Dots) */}
-                <div className="absolute inset-10 sm:inset-12 rounded-full bg-white/90 backdrop-blur-md shadow-[inset_0_2px_6px_rgba(0,0,0,0.06),_0_4px_16px_rgba(0,0,0,0.06)] border border-white/90 flex flex-col items-center justify-center pointer-events-none">
-                  <div className="flex items-center space-x-1.5">
+                <div className="absolute inset-3.5 xs:inset-5 sm:inset-9 md:inset-10 lg:inset-12 rounded-full bg-white/90 backdrop-blur-md shadow-[inset_0_2px_6px_rgba(0,0,0,0.06),_0_4px_16px_rgba(0,0,0,0.06)] border border-white/90 flex flex-col items-center justify-center pointer-events-none">
+                  <div className="flex items-center space-x-1 sm:space-x-1.5">
                     <div
-                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full transition-colors duration-300 shadow-sm ring-2 ring-white"
+                      className="w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-3.5 sm:h-3.5 rounded-full transition-colors duration-300 shadow-xs ring-1 sm:ring-2 ring-white"
                       style={{ backgroundColor: activePalette[0] }}
                     />
                     <div
-                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full transition-colors duration-300 shadow-sm ring-2 ring-white"
+                      className="w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-3.5 sm:h-3.5 rounded-full transition-colors duration-300 shadow-xs ring-1 sm:ring-2 ring-white"
                       style={{ backgroundColor: activePalette[1] }}
                     />
                     <div
-                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full transition-colors duration-300 shadow-sm ring-2 ring-white"
+                      className="w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-3.5 sm:h-3.5 rounded-full transition-colors duration-300 shadow-xs ring-1 sm:ring-2 ring-white"
                       style={{ backgroundColor: activePalette[2] }}
                     />
                   </div>
-                  <span className="mt-1 font-mono text-[9px] font-bold text-stone-400 uppercase tracking-widest">
+                  <span className="hidden sm:block mt-0.5 sm:mt-1 font-mono text-[7px] sm:text-[9px] font-bold text-stone-400 uppercase tracking-widest">
                     3-Color Triad
                   </span>
                 </div>
@@ -866,21 +902,21 @@ export function HomeHeroCanvas() {
 
                 {/* Floating Aesthetic Decorative Spheres */}
                 <span
-                  className="absolute -top-2 right-6 w-5 h-5 rounded-full shadow-md animate-bounce ring-2 ring-white"
+                  className="absolute -top-1 right-2 sm:-top-2 sm:right-6 w-2.5 h-2.5 sm:w-5 sm:h-5 rounded-full shadow-md animate-bounce ring-1 sm:ring-2 ring-white"
                   style={{ backgroundColor: activePalette[1] }}
                 />
                 <span
-                  className="absolute bottom-2 -left-2 w-5 h-5 rounded-full shadow-md animate-pulse ring-2 ring-white"
+                  className="absolute bottom-1 -left-1 sm:bottom-2 sm:-left-2 w-2.5 h-2.5 sm:w-5 sm:h-5 rounded-full shadow-md animate-pulse ring-1 sm:ring-2 ring-white"
                   style={{ backgroundColor: activePalette[0] }}
                 />
                 <span
-                  className="absolute top-1/2 -right-3 w-4 h-4 rounded-full shadow-md ring-2 ring-white"
+                  className="absolute top-1/2 -right-1.5 sm:-right-3 w-2 h-2 sm:w-4 sm:h-4 rounded-full shadow-md ring-1 sm:ring-2 ring-white"
                   style={{ backgroundColor: activePalette[2] }}
                 />
               </div>
 
               {/* Handwritten Label Bottom: Colors */}
-              <div className="mt-4 font-handwriting text-3xl sm:text-4xl text-stone-800 font-bold lg:pl-6">
+              <div className="mt-1.5 sm:mt-4 font-handwriting text-sm xs:text-base sm:text-3xl lg:text-4xl text-stone-800 font-bold">
                 Colors
               </div>
             </div>
@@ -889,38 +925,29 @@ export function HomeHeroCanvas() {
             {/* PILLAR 2: 2D CLEAN MINIMALIST COLOR CAPSULES (Center Plate)   */}
             {/* Simple, Flat, Crisp 2D Capsule Pod                           */}
             {/* ------------------------------------------------------------- */}
-            <div className="lg:col-span-4 flex flex-col items-center justify-center relative">
-              {/* Connecting Flow Arrow Left */}
-              <div
-                className={`hidden lg:flex absolute -left-10 xl:-left-16 top-1/2 -translate-y-1/2 text-stone-400 transition-all duration-500 ${
-                  stepPhase >= 2 ? 'opacity-100 scale-100' : 'opacity-40 scale-75'
-                }`}
-              >
-                <span className="text-3xl font-mono font-light tracking-tighter">→</span>
-              </div>
-
+            <div className="flex flex-col items-center justify-center relative">
               {/* 3-Color 2D Clean Capsule Card */}
               <div
-                className="bg-white border border-stone-200 rounded-[28px] px-5 sm:px-6 py-5 shadow-xl transition-all duration-300 max-w-[340px] w-full"
+                className="bg-white border border-stone-200 rounded-xl xs:rounded-2xl sm:rounded-[28px] px-2 py-2 xs:px-3 xs:py-2.5 sm:px-5 sm:py-5 shadow-lg sm:shadow-xl transition-all duration-300 max-w-[115px] xs:max-w-[140px] sm:max-w-[240px] md:max-w-[290px] lg:max-w-[340px] w-full"
                 style={{
-                  boxShadow: `0 16px 36px -10px ${activePalette[0]}20, 0 4px 16px rgba(0,0,0,0.04)`,
+                  boxShadow: `0 10px 25px -6px ${activePalette[0]}20, 0 4px 12px rgba(0,0,0,0.04)`,
                 }}
               >
                 {/* Capsule Plate Header */}
-                <div className="flex items-center justify-between mb-4 px-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: activePalette[0] }} />
-                    <span className="text-[11px] font-mono font-black text-stone-700 uppercase tracking-widest">
+                <div className="flex items-center justify-between mb-1.5 sm:mb-4 px-0.5">
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <span className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full animate-pulse flex-shrink-0" style={{ backgroundColor: activePalette[0] }} />
+                    <span className="text-[6px] xs:text-[7.5px] sm:text-[9px] md:text-[11px] font-mono font-black text-stone-700 uppercase tracking-wider truncate">
                       Color Capsules
                     </span>
                   </div>
-                  <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 border border-stone-200">
+                  <span className="text-[5px] xs:text-[6.5px] sm:text-[8px] md:text-[9px] font-mono font-bold px-1 py-0.2 sm:px-2 sm:py-0.5 rounded-full bg-stone-100 text-stone-600 border border-stone-200">
                     {capsuleFills[2] >= 100 ? 'Active' : 'Standby'}
                   </span>
                 </div>
 
                 {/* 3 Clean 2D Capsule Pills Row */}
-                <div className="flex items-center justify-center space-x-4 sm:space-x-5">
+                <div className="flex items-center justify-center space-x-1 xs:space-x-1.5 sm:space-x-3 md:space-x-4 lg:space-x-5">
                   {activePalette.map((hex, idx) => {
                     const isCopied = copiedHex === hex;
                     const roleTag = idx === 0 ? 'Primary' : idx === 1 ? 'Secondary' : 'Accent';
@@ -935,21 +962,21 @@ export function HomeHeroCanvas() {
                         title={fillLevel > 0 ? `Click to copy ${roleTag} (${hex})` : 'Capsule is filling...'}
                       >
                         {/* Pill Identity Header Badge */}
-                        <span className="mb-1.5 font-mono text-[9px] font-bold text-stone-400 group-hover:text-stone-800 transition-colors">
+                        <span className="mb-0.5 sm:mb-1.5 font-mono text-[5px] xs:text-[6.5px] sm:text-[8px] md:text-[9px] font-bold text-stone-400 group-hover:text-stone-800 transition-colors">
                           {pillCode}
                         </span>
 
                         {/* 2D Flat Capsule Pill Tube */}
                         <div
-                          className="w-12 sm:w-14 h-28 sm:h-32 rounded-full border-2 border-stone-300/90 bg-stone-100 relative overflow-hidden group-hover:scale-105 group-hover:-translate-y-1 transition-all duration-200 flex flex-col justify-end p-0"
+                          className="w-4.5 xs:w-6 sm:w-10 md:w-12 lg:w-14 h-11 xs:h-14 sm:h-22 md:h-28 lg:h-32 rounded-full border xs:border-[1.5px] sm:border-2 border-stone-300/90 bg-stone-100 relative overflow-hidden group-hover:scale-105 group-hover:-translate-y-0.5 sm:group-hover:-translate-y-1 transition-all duration-200 flex flex-col justify-end p-0"
                           style={{
                             boxShadow: fillLevel > 0 
-                              ? `0 8px 20px -4px ${hex}35` 
+                              ? `0 6px 16px -4px ${hex}35` 
                               : 'none',
                           }}
                         >
                           {/* Minimalist 2D Center Seam Line (50% height) */}
-                          <div className="absolute top-1/2 inset-x-0 -translate-y-1/2 h-[1.5px] bg-stone-300/80 z-20 pointer-events-none" />
+                          <div className="absolute top-1/2 inset-x-0 -translate-y-1/2 h-[1px] sm:h-[1.5px] bg-stone-300/80 z-20 pointer-events-none" />
 
                           {/* 2D Flat Liquid Color Fill */}
                           <div
@@ -969,21 +996,21 @@ export function HomeHeroCanvas() {
                           {/* Copied Feedback Overlay */}
                           {isCopied && (
                             <div className="absolute inset-0 z-30 flex items-center justify-center bg-stone-900/90 rounded-full animate-swatch-pop">
-                              <span className="text-[10px] font-mono font-black text-white">✓</span>
+                              <span className="text-[8px] sm:text-[10px] font-mono font-black text-white">✓</span>
                             </div>
                           )}
                         </div>
 
                         {/* HEX code label */}
                         <span 
-                          className="mt-2 font-mono text-[11px] sm:text-xs font-black tracking-wider transition-colors duration-200"
+                          className="mt-1 sm:mt-2 font-mono text-[4.5px] xs:text-[6px] sm:text-[9px] md:text-[11px] lg:text-xs font-black tracking-tighter sm:tracking-wider transition-colors duration-200"
                           style={{ color: fillLevel >= 80 ? '#1C1917' : '#9CA3AF' }}
                         >
                           {hex}
                         </span>
 
                         {/* Role tag */}
-                        <span className="text-[9px] font-mono font-bold text-stone-400 uppercase tracking-widest mt-0.5">
+                        <span className="hidden sm:block text-[7px] md:text-[8px] lg:text-[9px] font-mono font-bold text-stone-400 uppercase tracking-widest mt-0.5">
                           {roleTag}
                         </span>
                       </div>
@@ -992,17 +1019,8 @@ export function HomeHeroCanvas() {
                 </div>
               </div>
 
-              {/* Connecting Flow Arrow Right */}
-              <div
-                className={`hidden lg:flex absolute -right-10 xl:-right-16 top-1/2 -translate-y-1/2 text-stone-400 transition-all duration-500 ${
-                  stepPhase >= 4 ? 'opacity-100 scale-100' : 'opacity-40 scale-75'
-                }`}
-              >
-                <span className="text-3xl font-mono font-light tracking-tighter">→</span>
-              </div>
-
               {/* Handwritten Label Bottom: Palette */}
-              <div className="mt-4 font-handwriting text-3xl sm:text-4xl text-stone-800 font-bold">
+              <div className="mt-1.5 sm:mt-4 font-handwriting text-sm xs:text-base sm:text-3xl lg:text-4xl text-stone-800 font-bold">
                 Palette
               </div>
             </div>
@@ -1011,11 +1029,11 @@ export function HomeHeroCanvas() {
             {/* PILLAR 3: TYPOGRAPHY 'Aa' (Right)                             */}
             {/* Clean High-Contrast Typography Display                        */}
             {/* ------------------------------------------------------------- */}
-            <div className="lg:col-span-4 flex flex-col items-center lg:items-end justify-center relative lg:pr-4 xl:pr-8">
+            <div className="flex flex-col items-center justify-center relative">
               {/* Handwritten Note Top: Fonts Give Words a Voice */}
-              <div className="absolute -top-12 sm:-top-14 -right-2 sm:right-4 lg:right-8 flex items-center space-x-2 pointer-events-none transform rotate-6">
+              <div className="absolute -top-7 xs:-top-9 sm:-top-14 -right-1 xs:right-0 sm:right-2 lg:right-6 flex items-center space-x-1 sm:space-x-2 pointer-events-none transform rotate-6">
                 <svg
-                  className="w-9 h-9 text-stone-600 transform -rotate-12 -translate-y-1"
+                  className="w-4 h-4 xs:w-5 xs:h-5 sm:w-9 sm:h-9 text-stone-600 transform -rotate-12 -translate-y-0.5"
                   viewBox="0 0 40 40"
                   fill="none"
                   stroke="currentColor"
@@ -1024,12 +1042,12 @@ export function HomeHeroCanvas() {
                 >
                   <path d="M 34 12 C 22 10, 14 20, 16 32 M 24 30 L 16 34 L 12 26" />
                 </svg>
-                <span className="font-handwriting text-2xl sm:text-3xl lg:text-3xl text-stone-700 font-bold tracking-wide">
-                  Fonts Give Words a Voice
+                <span className="font-handwriting text-[9px] xs:text-[11px] sm:text-2xl lg:text-3xl text-stone-700 font-bold tracking-tight whitespace-nowrap">
+                  Fonts Give Voice
                 </span>
               </div>
 
-              {/* Large Creative Typography Display 'Aa' (Clean Gradient without Box Artifacts) */}
+              {/* Large Creative Typography Display 'Aa' */}
               <div
                 onMouseEnter={handleTypeHover}
                 onMouseMove={handleTypeHover}
@@ -1038,10 +1056,10 @@ export function HomeHeroCanvas() {
                 className={`flex flex-col items-center justify-center cursor-pointer group transition-all duration-300 ease-out transform ${
                   isTypeClicked ? 'scale-110' : 'hover:scale-105'
                 }`}
-                title="Hover over 'Aa' to trigger rapid font shuffle; Click to step to next font!"
+                title="Tap or hover to cycle fonts"
               >
                 <div
-                  className="text-9xl sm:text-[140px] md:text-[170px] lg:text-[195px] font-black tracking-tighter transition-all duration-300 leading-none select-none inline-block"
+                  className="text-4xl xs:text-5xl sm:text-8xl md:text-[130px] lg:text-[170px] xl:text-[195px] font-black tracking-tighter transition-all duration-300 leading-none select-none inline-block"
                   style={{
                     fontFamily: activeFont.family,
                     ...(isAaFilled
@@ -1062,26 +1080,26 @@ export function HomeHeroCanvas() {
                 </div>
 
                 {/* Dynamic Font Name Badge */}
-                <div className="mt-2 flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white border border-stone-200 shadow-xs transition-all duration-300">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: activePalette[0] }} />
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: activePalette[1] }} />
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: activePalette[2] }} />
-                  <span className="font-mono text-[11px] font-bold text-stone-800">
+                <div className="mt-1 sm:mt-2 flex items-center space-x-1 sm:space-x-1.5 px-1.5 py-0.5 xs:px-2 xs:py-0.5 sm:px-3 sm:py-1 rounded-full bg-white border border-stone-200 shadow-xs transition-all duration-300">
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full" style={{ backgroundColor: activePalette[0] }} />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full" style={{ backgroundColor: activePalette[1] }} />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full" style={{ backgroundColor: activePalette[2] }} />
+                  <span className="font-mono text-[6px] xs:text-[7.5px] sm:text-[9px] md:text-[11px] font-bold text-stone-800 truncate max-w-[50px] xs:max-w-[70px] sm:max-w-none">
                     {activeFont.name}
                   </span>
                 </div>
               </div>
 
               {/* Handwritten Label Bottom: Typography */}
-              <div className="mt-3 font-handwriting text-3xl sm:text-4xl text-stone-800 font-bold lg:pr-6">
+              <div className="mt-1.5 sm:mt-4 font-handwriting text-sm xs:text-base sm:text-3xl lg:text-4xl text-stone-800 font-bold">
                 Typography
               </div>
             </div>
           </div>
 
           {/* Interactive Font Selector Pills Bar + Replay Trigger */}
-          <div className="flex flex-wrap items-center justify-center gap-2.5 pt-10 transition-all duration-700">
-            <span className="text-[11px] font-mono font-bold text-stone-400 uppercase tracking-wider mr-2">
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 pt-6 sm:pt-10 transition-all duration-700">
+            <span className="text-[9px] xs:text-[10px] sm:text-[11px] font-mono font-bold text-stone-400 uppercase tracking-wider mr-1 sm:mr-2">
               Preview Fonts:
             </span>
             {FONTS_LIST.map((font, idx) => {
@@ -1097,7 +1115,6 @@ export function HomeHeroCanvas() {
                     }
                     setActiveFont(font);
                     setActiveFontIndex(idx);
-                    showToast(`Selected font: ${font.name}`, 'info');
                   }}
                   onMouseEnter={() => {
                     if (fontCycleIntervalRef.current) {
@@ -1107,7 +1124,7 @@ export function HomeHeroCanvas() {
                     setActiveFont(font);
                     setActiveFontIndex(idx);
                   }}
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 cursor-pointer ${
+                  className={`px-2.5 py-1 sm:px-4 sm:py-2 rounded-xl text-[10px] xs:text-xs sm:text-sm font-semibold transition-all duration-150 cursor-pointer ${
                     isCurrent
                       ? 'bg-stone-900 text-white shadow-md scale-105'
                       : 'bg-white/90 hover:bg-white text-stone-600 hover:text-stone-950 border border-stone-200/90 shadow-2xs'
@@ -1125,10 +1142,10 @@ export function HomeHeroCanvas() {
                 e.stopPropagation();
                 runSequence();
               }}
-              className="ml-2 inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-mono font-bold text-stone-600 hover:text-stone-950 bg-stone-100/90 hover:bg-stone-200/90 border border-stone-200 shadow-2xs transition-all hover:scale-105 cursor-pointer"
+              className="ml-1 sm:ml-2 inline-flex items-center space-x-1 sm:space-x-1.5 px-2.5 py-1 sm:px-3.5 sm:py-2 rounded-xl text-[10px] xs:text-xs font-mono font-bold text-stone-600 hover:text-stone-950 bg-stone-100/90 hover:bg-stone-200/90 border border-stone-200 shadow-2xs transition-all hover:scale-105 cursor-pointer"
               title="Replay sequence animation"
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                 <path d="M3 3v5h5" />
               </svg>
@@ -1140,4 +1157,5 @@ export function HomeHeroCanvas() {
     </section>
   );
 }
+
 

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Wand2,
+  Home,
   Palette,
   Type,
   LayoutGrid,
   Search,
-  ChevronDown,
   Sparkles,
   Layers,
   CheckCircle2,
@@ -15,8 +14,8 @@ import {
   Code2,
   Star,
   ArrowRightLeft,
-  Shuffle,
   Sun,
+  Wand2,
 } from 'lucide-react';
 import { STUDIOS_REGISTRY } from '../../studios/registry';
 import { useSharedDesign } from '../../context/SharedDesignContext';
@@ -29,7 +28,7 @@ export function AppMenuBar({
   onOpenSearch,
 }) {
   const { showToast } = useToast();
-  const { activePalette, sendPaletteToColorStudio } = useSharedDesign();
+  const { activePalette } = useSharedDesign();
 
   const [hoveredMenu, setHoveredMenu] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -92,37 +91,40 @@ export function AppMenuBar({
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full px-4 sm:px-8 transition-all duration-300 select-none ${
+      className={`sticky top-0 z-50 w-full px-3 sm:px-6 lg:px-8 transition-all duration-300 select-none ${
         isScrolled
-          ? 'py-2 backdrop-blur-2xl bg-white/80 border-b border-stone-200/90 shadow-md shadow-stone-900/5'
-          : 'py-3 backdrop-blur-xl bg-white/60 border-b border-stone-200/60'
+          ? 'py-2 backdrop-blur-2xl bg-white/85 border-b border-stone-200/90 shadow-md shadow-stone-900/5'
+          : 'py-2.5 sm:py-3 backdrop-blur-xl bg-white/70 border-b border-stone-200/60'
       }`}
     >
-      <div className="max-w-[1600px] mx-auto flex items-center justify-between">
+      <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-2">
         {/* Left: Brand Logo */}
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
           <button
             onClick={() => onNavigate('home', null)}
             className="flex items-center space-x-1 text-left group cursor-pointer"
+            title="LooksGood Home"
           >
-            <span className="font-extrabold text-2xl tracking-tight text-stone-950 font-display group-hover:opacity-85 transition-opacity">
+            <span className="font-extrabold text-lg sm:text-2xl tracking-tight text-stone-950 font-display group-hover:opacity-85 transition-opacity">
               LooksGood<span className="text-[#EC4899]">.</span>
             </span>
           </button>
         </div>
 
-        {/* Center Navigation Pill matching reference image */}
-        <nav className="flex items-center space-x-1 p-1 bg-stone-100/80 backdrop-blur-md rounded-2xl border border-stone-200/80 shadow-2xs">
+        {/* Center / Mobile Nav: 3 Compact Icons on Mobile, Full Pills with Submenus on Desktop */}
+        <nav className="flex items-center space-x-0.5 sm:space-x-1 p-0.5 sm:p-1 bg-stone-100/90 backdrop-blur-md rounded-2xl border border-stone-200/80 shadow-2xs">
           {/* 1. Home */}
           <button
             onClick={() => onNavigate('home', null)}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer ${
+            className={`px-2.5 sm:px-4 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer ${
               activeStudio === 'home'
-                ? 'bg-white text-stone-900 shadow-xs'
+                ? 'bg-white text-stone-900 shadow-xs ring-1 ring-stone-200/60'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-white/50'
             }`}
+            title="Home"
           >
-            <span>Home</span>
+            <Home className="w-4 h-4 flex-shrink-0" />
+            <span className="hidden md:inline">Home</span>
           </button>
 
           {/* 2. Color Studio (with purple dot) */}
@@ -133,19 +135,21 @@ export function AppMenuBar({
           >
             <button
               onClick={() => onNavigate('colors', 'custom')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 cursor-pointer ${
+              className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 sm:space-x-2 cursor-pointer ${
                 activeStudio === 'colors'
                   ? 'bg-white text-stone-900 shadow-xs ring-1 ring-purple-200'
                   : 'text-stone-600 hover:text-stone-900 hover:bg-white/50'
               }`}
+              title="Color Studio"
             >
-              <span>Color Studio</span>
-              <span className="w-2 h-2 rounded-full bg-purple-600" />
+              <Palette className="w-4 h-4 text-purple-600 flex-shrink-0" />
+              <span className="hidden md:inline">Color Studio</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-600 flex-shrink-0" />
             </button>
 
-            {/* Hover Submenu */}
+            {/* Hover Submenu for Desktop */}
             {hoveredMenu === 'colors' && (
-              <div className="absolute top-full left-0 mt-1.5 w-72 bg-white/95 backdrop-blur-2xl border border-stone-200 rounded-2xl shadow-2xl p-2 z-50 animate-fade-in divide-y divide-stone-100">
+              <div className="absolute top-full left-0 mt-1.5 w-72 bg-white/95 backdrop-blur-2xl border border-stone-200 rounded-2xl shadow-2xl p-2 z-50 animate-fade-in divide-y divide-stone-100 hidden md:block">
                 <div className="px-3 py-1.5">
                   <span className="text-[10px] font-mono font-bold text-stone-400 uppercase tracking-widest block">
                     Color Tools
@@ -190,19 +194,21 @@ export function AppMenuBar({
           >
             <button
               onClick={() => onNavigate('typography', 'explorer')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-2 cursor-pointer ${
+              className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 sm:space-x-2 cursor-pointer ${
                 activeStudio === 'typography'
                   ? 'bg-white text-stone-900 shadow-xs ring-1 ring-pink-200'
                   : 'text-stone-600 hover:text-stone-900 hover:bg-white/50'
               }`}
+              title="Typography Studio"
             >
-              <span>Typography Studio</span>
-              <span className="w-2 h-2 rounded-full bg-pink-500" />
+              <Type className="w-4 h-4 text-pink-500 flex-shrink-0" />
+              <span className="hidden md:inline">Typography Studio</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-pink-500 flex-shrink-0" />
             </button>
 
-            {/* Hover Submenu */}
+            {/* Hover Submenu for Desktop */}
             {hoveredMenu === 'typography' && (
-              <div className="absolute top-full left-0 mt-1.5 w-72 bg-white/95 backdrop-blur-2xl border border-stone-200 rounded-2xl shadow-2xl p-2 z-50 animate-fade-in divide-y divide-stone-100">
+              <div className="absolute top-full left-0 mt-1.5 w-72 bg-white/95 backdrop-blur-2xl border border-stone-200 rounded-2xl shadow-2xl p-2 z-50 animate-fade-in divide-y divide-stone-100 hidden md:block">
                 <div className="px-3 py-1.5">
                   <span className="text-[10px] font-mono font-bold text-stone-400 uppercase tracking-widest block">
                     Typography Tools
@@ -239,26 +245,27 @@ export function AppMenuBar({
             )}
           </div>
 
-          {/* 4. All Tools */}
+          {/* 4. All Tools (Shown on desktop or larger screens) */}
           <button
             onClick={() => onNavigate('allTools', null)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer ${
+            className={`hidden md:flex px-3.5 py-1.5 rounded-xl text-xs font-bold transition items-center space-x-1.5 cursor-pointer ${
               activeStudio === 'allTools'
-                ? 'bg-white text-stone-900 shadow-xs'
+                ? 'bg-white text-stone-900 shadow-xs ring-1 ring-stone-200'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-white/50'
             }`}
+            title="All Design Tools"
           >
             <LayoutGrid className="w-3.5 h-3.5" />
             <span>All Tools</span>
           </button>
         </nav>
 
-        {/* Right Controls matching reference image */}
-        <div className="flex items-center space-x-3 text-stone-700 text-xs font-medium">
+        {/* Right Controls */}
+        <div className="flex items-center space-x-1.5 sm:space-x-3 text-stone-700 text-xs font-medium flex-shrink-0">
           {/* Active 4-color dots indicator */}
           <div
             onClick={() => onNavigate('colors', 'palette')}
-            className="flex items-center space-x-1.5 cursor-pointer hover:opacity-80 transition"
+            className="flex items-center space-x-1 sm:space-x-1.5 cursor-pointer hover:opacity-80 transition"
             title="Active Design Palette"
           >
             {['primary', 'accent', 'secondary', 'text'].map((role, idx) => {
@@ -266,7 +273,7 @@ export function AppMenuBar({
               return (
                 <span
                   key={idx}
-                  className="w-2.5 h-2.5 rounded-full shadow-2xs"
+                  className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shadow-2xs"
                   style={{ backgroundColor: activePalette[role] || defaultColors[idx] }}
                 />
               );
@@ -276,7 +283,7 @@ export function AppMenuBar({
           {/* Sun / Theme icon */}
           <button
             onClick={() => showToast('Color profile calibrated for studio accuracy', 'info')}
-            className="p-1 rounded-lg hover:bg-stone-100 text-stone-600 transition cursor-pointer"
+            className="hidden sm:flex p-1 rounded-lg hover:bg-stone-100 text-stone-600 transition cursor-pointer"
             title="Studio Display Calibrated"
           >
             <Sun className="w-4 h-4" />
@@ -285,7 +292,7 @@ export function AppMenuBar({
           {/* Search Button (⌘K) */}
           <button
             onClick={onOpenSearch}
-            className="px-3 py-1.5 rounded-xl bg-stone-100/90 hover:bg-stone-200/80 border border-stone-200 text-stone-600 transition flex items-center space-x-2 cursor-pointer"
+            className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-stone-100/90 hover:bg-stone-200/80 border border-stone-200 text-stone-600 transition flex items-center space-x-1.5 cursor-pointer"
             title="Search Tools (⌘K)"
           >
             <Search className="w-3.5 h-3.5 text-stone-500" />
@@ -307,3 +314,4 @@ export function AppMenuBar({
     </header>
   );
 }
+
