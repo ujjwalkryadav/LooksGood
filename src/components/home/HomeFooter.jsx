@@ -115,6 +115,48 @@ export function HomeFooter({ onNavigateStudio }) {
 
         {/* Middle Tier: Structured Studio Links */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-12 gap-8 pb-8 border-b border-stone-200/60">
+          {/* AI Assistant Studio Links */}
+          <div className="lg:col-span-4 space-y-3">
+            <span className="text-xs font-mono font-bold text-stone-950 uppercase tracking-widest block flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-500 animate-pulse" />
+              <span>AI Design Assistant</span>
+            </span>
+            <ul className="space-y-2 text-xs text-stone-600 font-medium">
+              <li>
+                <button
+                  onClick={(e) => handleLinkClick(e, 'ai', 'generator')}
+                  className="hover:text-purple-600 hover:translate-x-0.5 transition cursor-pointer text-left font-bold text-purple-700"
+                >
+                  • Gemini Brand & System Architect
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={(e) => handleLinkClick(e, 'ai', 'templates')}
+                  className="hover:text-purple-600 hover:translate-x-0.5 transition cursor-pointer text-left"
+                >
+                  • 1-Click Prompt Templates
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={(e) => handleLinkClick(e, 'ai', 'saved')}
+                  className="hover:text-purple-600 hover:translate-x-0.5 transition cursor-pointer text-left"
+                >
+                  • Saved Design Systems Library
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={(e) => handleLinkClick(e, 'ai', 'generator')}
+                  className="hover:text-purple-600 hover:translate-x-0.5 transition cursor-pointer text-left"
+                >
+                  • Google AI Studio Key Settings
+                </button>
+              </li>
+            </ul>
+          </div>
+
           {/* Color Studio Links */}
           <div className="lg:col-span-4 space-y-3">
             <span className="text-xs font-mono font-bold text-stone-950 uppercase tracking-widest block flex items-center space-x-1.5">

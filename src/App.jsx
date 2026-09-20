@@ -3,6 +3,7 @@ import { ToastProvider, useToast } from './context/ToastContext';
 import { SharedDesignProvider, useSharedDesign } from './context/SharedDesignContext';
 import { AppMenuBar } from './components/layout/AppMenuBar';
 import { HomeSoftwareHub } from './components/home/HomeSoftwareHub';
+import { AiStudioHub } from './studios/ai/AiStudioHub';
 import { ColorStudioHub } from './studios/color/ColorStudioHub';
 import { TypographyStudioHub } from './studios/typography/TypographyStudioHub';
 import { AllToolsDirectory } from './studios/allTools/AllToolsDirectory';
@@ -20,6 +21,7 @@ function getBasePath() {
 function getPathFromState(studioId, tabId) {
   const base = getBasePath();
   if (studioId === 'home') return base ? `${base}/` : '/';
+  if (studioId === 'ai') return tabId ? `${base}/ai-assistant/${tabId}` : `${base}/ai-assistant`;
   if (studioId === 'colors') return tabId ? `${base}/color-studio/${tabId}` : `${base}/color-studio`;
   if (studioId === 'typography') return tabId ? `${base}/typography-studio/${tabId}` : `${base}/typography-studio`;
   if (studioId === 'allTools') return `${base}/all-tools`;
@@ -33,6 +35,11 @@ function parseStateFromPath(pathname) {
   }
   if (clean === '/' || clean === '/home') {
     return { studioId: 'home', tabId: null };
+  }
+  if (clean.startsWith('/ai-assistant')) {
+    const parts = clean.split('/').filter(Boolean);
+    const tabId = parts[1] || 'generator';
+    return { studioId: 'ai', tabId };
   }
   if (clean.startsWith('/color-studio')) {
     const parts = clean.split('/').filter(Boolean);
@@ -95,11 +102,13 @@ function SoftwareAppMain() {
         if (isSearchOpen) setIsSearchOpen(false);
       } else if (e.key === '1') {
         handleNavigate('home');
-      } else if (e.key === '2') {
-        handleNavigate('colors', 'palette');
+      } else if (e.key === '2' || e.key.toLowerCase() === 'a') {
+        handleNavigate('ai', 'generator');
       } else if (e.key === '3') {
-        handleNavigate('typography', 'explorer');
+        handleNavigate('colors', 'palette');
       } else if (e.key === '4') {
+        handleNavigate('typography', 'explorer');
+      } else if (e.key === '5') {
         handleNavigate('allTools');
       } else if (e.code === 'Space') {
         e.preventDefault();
@@ -145,6 +154,13 @@ function SoftwareAppMain() {
           <HomeSoftwareHub onNavigate={handleNavigate} />
         )}
 
+        {activeStudio === 'ai' && (
+          <AiStudioHub
+            initialTab={activeTab || 'generator'}
+            onNavigateStudio={(studioId, tabId) => handleNavigate(studioId, tabId)}
+          />
+        )}
+
         {activeStudio === 'colors' && (
           <ColorStudioHub
             initialTab={activeTab || 'custom'}
@@ -175,7 +191,7 @@ function SoftwareAppMain() {
               <input
                 type="text"
                 autoFocus
-                placeholder="Search tools across all studios (Colors, Typography, Scales)..."
+                placeholder="Search tools across all studios (AI, Colors, Typography, Scales)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-transparent text-sm font-medium focus:outline-none text-stone-900 placeholder-stone-400"
@@ -187,6 +203,8 @@ function SoftwareAppMain() {
 
             <div className="space-y-1 max-h-72 overflow-y-auto">
               {[
+                { studio: 'ai', tab: 'generator', title: 'AI Assistant: Brand & System Architect', desc: 'Synthesize full color palettes & typography from concepts', key: 'AI' },
+                { studio: 'ai', tab: 'templates', title: 'AI Assistant: Concept Templates', desc: '1-click curated prompt templates for SaaS, Coffee, Luxury & Kids', key: 'T' },
                 { studio: 'colors', tab: 'custom', title: 'Color Studio: Smart Palette Synthesizer', desc: 'Choose 2, 3, 4, 5 colors & questions for 4 custom palettes', key: '1' },
                 { studio: 'colors', tab: 'palette', title: 'Color Studio: Palette & Harmonies', desc: 'Harmonic color wheel & 5-role system', key: '2' },
                 { studio: 'colors', tab: 'shades', title: 'Color Studio: Shades & Tints (50-950)', desc: '11-step mathematical Tailwind shade scale', key: 'S' },

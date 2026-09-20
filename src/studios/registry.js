@@ -3,6 +3,23 @@
 
 export const STUDIOS_REGISTRY = [
   {
+    id: 'ai',
+    name: 'AI Design Assistant',
+    shortName: 'AI Assistant',
+    description: 'Generative AI brand architect powered by Google AI Studio Gemini. Turn concepts into complete 60-30-10 palettes, Google Fonts pairings, UI tokens, and live mockups.',
+    badge: 'Gemini AI',
+    status: 'active',
+    icon: 'Sparkles',
+    accentColor: '#8B5CF6',
+    bgGradient: 'from-[#7C3AED] via-[#9333EA] to-[#EC4899]',
+    defaultTab: 'generator',
+    tabs: [
+      { id: 'generator', name: 'Brand & System Architect', icon: 'Sparkles', desc: 'Synthesize custom design systems from text concepts using Gemini AI' },
+      { id: 'templates', name: 'Concept Templates', icon: 'Flame', desc: '1-click curated prompt templates for SaaS, Luxury, Coffee & EdTech' },
+      { id: 'saved', name: 'Saved Systems Library', icon: 'Star', desc: 'Access, compare, and export previously generated design guides' },
+    ],
+  },
+  {
     id: 'colors',
     name: 'Colors Studio',
     shortName: 'Colors',

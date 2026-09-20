@@ -68,6 +68,7 @@ export function AppMenuBar({
     return () => clearInterval(timer);
   }, []);
 
+  const aiStudioMeta = STUDIOS_REGISTRY.find((s) => s.id === 'ai');
   const colorsStudioMeta = STUDIOS_REGISTRY.find((s) => s.id === 'colors');
   const typoStudioMeta = STUDIOS_REGISTRY.find((s) => s.id === 'typography');
 
@@ -111,12 +112,12 @@ export function AppMenuBar({
           </button>
         </div>
 
-        {/* Center / Mobile Nav: 3 Compact Icons on Mobile, Full Pills with Submenus on Desktop */}
+        {/* Center / Mobile Nav: Full Pills with Submenus */}
         <nav className="flex items-center space-x-0.5 sm:space-x-1 p-0.5 sm:p-1 bg-stone-100/90 backdrop-blur-md rounded-2xl border border-stone-200/80 shadow-2xs">
           {/* 1. Home */}
           <button
             onClick={() => onNavigate('home', null)}
-            className={`px-2.5 sm:px-4 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer ${
+            className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer ${
               activeStudio === 'home'
                 ? 'bg-white text-stone-900 shadow-xs ring-1 ring-stone-200/60'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-white/50'
@@ -127,7 +128,74 @@ export function AppMenuBar({
             <span className="hidden md:inline">Home</span>
           </button>
 
-          {/* 2. Color Studio (with purple dot) */}
+          {/* 2. AI Assistant (with glowing gradient & Sparkles) */}
+          <div
+            className="relative"
+            onMouseEnter={() => setHoveredMenu('ai')}
+            onMouseLeave={() => setHoveredMenu(null)}
+          >
+            <button
+              onClick={() => onNavigate('ai', 'generator')}
+              className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 sm:space-x-2 cursor-pointer ${
+                activeStudio === 'ai'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-600/25 ring-1 ring-purple-400/50'
+                  : 'text-stone-700 hover:text-purple-700 hover:bg-purple-50/70'
+              }`}
+              title="AI Assistant (Gemini Powered)"
+            >
+              <Sparkles className={`w-4 h-4 flex-shrink-0 ${activeStudio === 'ai' ? 'text-pink-300 animate-pulse' : 'text-purple-600'}`} />
+              <span className="inline font-extrabold">AI Assistant</span>
+              <span className="px-1.5 py-0.2 text-[9px] font-mono font-black rounded-md uppercase tracking-wider bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-2xs hidden sm:inline-block">
+                AI
+              </span>
+            </button>
+
+            {/* Hover Submenu for Desktop */}
+            {hoveredMenu === 'ai' && (
+              <div className="absolute top-full left-0 mt-1.5 w-72 bg-white/95 backdrop-blur-2xl border border-stone-200 rounded-2xl shadow-2xl p-2 z-50 animate-fade-in divide-y divide-stone-100 hidden md:block">
+                <div className="px-3 py-1.5 flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold text-purple-600 uppercase tracking-widest block">
+                    Google AI Studio
+                  </span>
+                  <span className="text-[10px] text-stone-400 font-medium">Gemini 2.5</span>
+                </div>
+                <div className="py-1 space-y-0.5">
+                  {aiStudioMeta?.tabs.map((tool) => {
+                    const Icon = getSubToolIcon(tool.icon);
+                    const isCurrent = activeStudio === 'ai' && activeTab === tool.id;
+                    return (
+                      <button
+                        key={tool.id}
+                        onClick={() => {
+                          onNavigate('ai', tool.id);
+                          setHoveredMenu(null);
+                        }}
+                        className={`w-full p-2.5 rounded-xl flex items-center space-x-3 text-left transition cursor-pointer ${
+                          isCurrent
+                            ? 'bg-purple-50 text-purple-900 font-bold border border-purple-200/60'
+                            : 'hover:bg-stone-50 text-stone-700 hover:text-stone-950'
+                        }`}
+                      >
+                        <div className="w-6 h-6 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 flex-shrink-0">
+                          <Icon className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold block leading-tight">
+                            {tool.name}
+                          </span>
+                          <span className="text-[10px] text-stone-400 line-clamp-1">
+                            {tool.desc}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 3. Color Studio (with purple dot) */}
           <div
             className="relative"
             onMouseEnter={() => setHoveredMenu('colors')}
@@ -186,7 +254,7 @@ export function AppMenuBar({
             )}
           </div>
 
-          {/* 3. Typography Studio (with pink dot) */}
+          {/* 4. Typography Studio (with pink dot) */}
           <div
             className="relative"
             onMouseEnter={() => setHoveredMenu('typography')}
@@ -245,7 +313,7 @@ export function AppMenuBar({
             )}
           </div>
 
-          {/* 4. All Tools (Shown on desktop or larger screens) */}
+          {/* 5. All Tools (Shown on desktop or larger screens) */}
           <button
             onClick={() => onNavigate('allTools', null)}
             className={`hidden md:flex px-3.5 py-1.5 rounded-xl text-xs font-bold transition items-center space-x-1.5 cursor-pointer ${
